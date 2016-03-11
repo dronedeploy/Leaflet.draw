@@ -1228,7 +1228,7 @@ L.Edit.Poly = L.Handler.extend({
     addHooks: function () {
         var poly = this._poly;
 
-        if (!(poly instanceof L.Polygon)) {
+        if (!(poly instanceof L.Polygon) && poly.options.editing) {
             poly.options.editing.fill = false;
         }
 
