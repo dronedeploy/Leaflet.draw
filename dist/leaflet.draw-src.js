@@ -1410,6 +1410,7 @@ L.Edit.Poly = L.Handler.extend({
     },
 
     _revertChange: function () {
+        if (!this._geometryHistory || !this._geometryHistory.length) { return; }
         this._poly._setLatLngs(this._geometryHistory.pop());
         this._poly.redraw();
         this.updateMarkers();
