@@ -69,6 +69,12 @@ L.Edit.Poly = L.Handler.extend({
         this._initMarkers();
     },
 
+    undo: function () {
+        this._revertChange();
+        this._fireEdit();
+    },
+
+
     _initMarkers: function () {
         if (!this._markerGroup) {
             this._markerGroup = new L.LayerGroup();
@@ -205,7 +211,7 @@ L.Edit.Poly = L.Handler.extend({
     },
 
     _revertChange: function () {
-        this._poly._setLatLngs(this._originalLatLngs);
+        this._poly._setLatLngs(this._geometryHistory.pop());
         this._poly.redraw();
         this.updateMarkers();
     },
@@ -217,7 +223,8 @@ L.Edit.Poly = L.Handler.extend({
     },
 
     _onMarkerDragStart: function () {
-        this._originalLatLngs = L.LatLngUtil.cloneLatLngs(this._poly.getLatLngs());
+        this._geometryHistory = this._geometryHistory || [];
+        this._geometryHistory.push(L.LatLngUtil.cloneLatLngs(this._poly.getLatLngs()));
     },
 
     _onMarkerDrag: function (e) {
