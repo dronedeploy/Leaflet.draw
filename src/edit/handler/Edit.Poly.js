@@ -74,7 +74,7 @@ L.Edit.Poly = L.Handler.extend({
         this._fireEdit();
     },
 
-    updatePosition: function(latLngs) {
+    updatePosition: function (latLngs) {
         this._saveGeometry();
         this._poly.setLatLngs(latLngs);
         this._poly.redraw();
@@ -233,7 +233,7 @@ L.Edit.Poly = L.Handler.extend({
         this._saveGeometry();
     },
 
-    _saveGeometry: function(latLngs) {
+    _saveGeometry: function () {
         this._geometryHistory = this._geometryHistory || [];
         this._geometryHistory.push(L.LatLngUtil.cloneLatLngs(this._poly.getLatLngs()));
     },

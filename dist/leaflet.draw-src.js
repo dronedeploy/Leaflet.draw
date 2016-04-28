@@ -1273,6 +1273,12 @@ L.Edit.Poly = L.Handler.extend({
         this._fireEdit();
     },
 
+    updatePosition: function (latLngs) {
+        this._saveGeometry();
+        this._poly.setLatLngs(latLngs);
+        this._poly.redraw();
+        this.updateMarkers();
+    },
 
     _initMarkers: function () {
         if (!this._markerGroup) {
@@ -1423,6 +1429,10 @@ L.Edit.Poly = L.Handler.extend({
     },
 
     _onMarkerDragStart: function () {
+        this._saveGeometry();
+    },
+
+    _saveGeometry: function () {
         this._geometryHistory = this._geometryHistory || [];
         this._geometryHistory.push(L.LatLngUtil.cloneLatLngs(this._poly.getLatLngs()));
     },
