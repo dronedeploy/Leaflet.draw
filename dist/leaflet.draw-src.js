@@ -1427,7 +1427,7 @@ L.Edit.Poly = L.Handler.extend({
     },
 
     _onMarkerDragStart: function () {
-        this._saveGeometry();
+        this.saveGeometry();
     },
 
     _onMarkerDrag: function (e) {
