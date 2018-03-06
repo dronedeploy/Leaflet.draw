@@ -82,7 +82,7 @@ L.Edit.Poly = L.Handler.extend({
 
         for (i = 0, len = latlngs.length; i < len; i++) {
 
-            marker = this._createMarker(latlngs[i], i);
+            marker = this._createMarker(latlngs[i], i, this.options.cornerIcon || this.options.icon);
             marker.on('click', this._onMarkerClick, this);
             this._markers.push(marker);
         }
@@ -102,11 +102,11 @@ L.Edit.Poly = L.Handler.extend({
         }
     },
 
-    _createMarker: function (latlng, index) {
+    _createMarker: function (latlng, index, icon) {
         // Extending L.Marker in TouchEvents.js to include touch.
         var marker = new L.Marker(latlng, {
             draggable: true,
-            icon: this.options.icon,
+            icon: icon || this.options.icon,
         });
 
         marker._origLatLng = latlng;
