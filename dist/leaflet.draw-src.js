@@ -1278,6 +1278,10 @@ L.Edit.Poly = L.Handler.extend({
     },
 
     _initMarkers: function () {
+
+        var poly = this._poly;
+        var maxPoints = poly.options.maxPoints || 0;
+
         if (!this._markerGroup) {
             this._markerGroup = new L.LayerGroup();
         }
@@ -1293,6 +1297,11 @@ L.Edit.Poly = L.Handler.extend({
             marker = this._createMarker(latlngs[i], i, this.options.cornerIcon || this.options.icon);
             marker.on('click', this._onMarkerClick, this);
             this._markers.push(marker);
+        }
+
+        var removeMiddleMarker = maxPoints > 0 && latlngs.length > maxPoints;
+        if (removeMiddleMarker) {
+            return;
         }
 
         var markerLeft, markerRight;
@@ -1446,6 +1455,9 @@ L.Edit.Poly = L.Handler.extend({
 
     _onMarkerClick: function (e) {
 
+        var poly = this._poly;
+        var maxPoints = poly.options.maxPoints || 0;
+
         var minPoints = L.Polygon && (this._poly instanceof L.Polygon) ? 4 : 3,
             marker = e.target;
 
@@ -1469,13 +1481,13 @@ L.Edit.Poly = L.Handler.extend({
         }
 
         // create a ghost marker in place of the removed one
-        if (marker._prev && marker._next) {
+        if (marker._prev && marker._next && maxPoints > 0 && poly._latlngs.length < maxPoints) {
             this._createMiddleMarker(marker._prev, marker._next);
 
-        } else if (!marker._prev) {
+        } else if (!marker._prev && maxPoints > 0 && poly._latlngs.length < maxPoints) {
             marker._next._middleLeft = null;
 
-        } else if (!marker._next) {
+        } else if (!marker._next && maxPoints > 0 && poly._latlngs.length < maxPoints) {
             marker._prev._middleRight = null;
         }
 

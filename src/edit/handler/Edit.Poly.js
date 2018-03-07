@@ -101,7 +101,7 @@ L.Edit.Poly = L.Handler.extend({
             this._markers.push(marker);
         }
 
-        var removeMiddleMarker = maxPoints !== 0 && latlngs.length > maxPoints;
+        var removeMiddleMarker = maxPoints > 0 && latlngs.length > maxPoints;
         if (removeMiddleMarker) {
             return;
         }
@@ -283,13 +283,13 @@ L.Edit.Poly = L.Handler.extend({
         }
 
         // create a ghost marker in place of the removed one
-        if (marker._prev && marker._next && maxPoints !== 0 && poly._latlngs.length < maxPoints) {
+        if (marker._prev && marker._next && maxPoints > 0 && poly._latlngs.length < maxPoints) {
             this._createMiddleMarker(marker._prev, marker._next);
 
-        } else if (!marker._prev && maxPoints !== 0 && poly._latlngs.length < maxPoints) {
+        } else if (!marker._prev && maxPoints > 0 && poly._latlngs.length < maxPoints) {
             marker._next._middleLeft = null;
 
-        } else if (!marker._next && maxPoints !== 0 && poly._latlngs.length < maxPoints) {
+        } else if (!marker._next && maxPoints > 0 && poly._latlngs.length < maxPoints) {
             marker._prev._middleRight = null;
         }
 
