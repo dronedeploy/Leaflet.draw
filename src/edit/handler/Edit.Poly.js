@@ -10,6 +10,7 @@ L.Edit.Poly = L.Handler.extend({
             iconSize: new L.Point(8, 8),
             className: 'leaflet-div-icon leaflet-editing-icon'
         }),
+        maxPoints: 0,
         touchIcon: new L.DivIcon({
             iconSize: new L.Point(20, 20),
             className: 'leaflet-div-icon leaflet-editing-icon leaflet-touch-icon'
@@ -81,7 +82,7 @@ L.Edit.Poly = L.Handler.extend({
 
     _initMarkers: function () {
 
-        var maxPoints = this.options.maxPoints || 0;
+        var maxPoints = this.options.maxPoints;
 
         if (!this._markerGroup) {
             this._markerGroup = new L.LayerGroup();
@@ -257,6 +258,7 @@ L.Edit.Poly = L.Handler.extend({
     _onMarkerClick: function (e) {
 
         var maxPoints = this.options.maxPoints || 0;
+        var lessThanMaxPoints = maxPoints > 0 && this._poly._latlngs.length < maxPoints;
 
         var minPoints = L.Polygon && (this._poly instanceof L.Polygon) ? 4 : 3,
             marker = e.target;
@@ -281,13 +283,13 @@ L.Edit.Poly = L.Handler.extend({
         }
 
         // create a ghost marker in place of the removed one
-        if (marker._prev && marker._next && maxPoints > 0 && this._poly._latlngs.length < maxPoints) {
+        if (marker._prev && marker._next && lessThanMaxPoints) {
             this._createMiddleMarker(marker._prev, marker._next);
 
-        } else if (!marker._prev && maxPoints > 0 && this._poly._latlngs.length < maxPoints) {
+        } else if (!marker._prev && lessThanMaxPoints) {
             marker._next._middleLeft = null;
 
-        } else if (!marker._next && maxPoints > 0 && this._poly._latlngs.length < maxPoints) {
+        } else if (!marker._next && lessThanMaxPoints) {
             marker._prev._middleRight = null;
         }
 
