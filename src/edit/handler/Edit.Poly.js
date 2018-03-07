@@ -29,7 +29,7 @@ L.Edit.Poly = L.Handler.extend({
     addHooks: function () {
         var poly = this._poly;
 
-        if (!(poly instanceof L.Polygon)) {
+        if (!(poly instanceof L.Polygon) && poly.options.editing) {
             poly.options.editing.fill = false;
         }
 
@@ -67,6 +67,16 @@ L.Edit.Poly = L.Handler.extend({
     updateMarkers: function () {
         this._markerGroup.clearLayers();
         this._initMarkers();
+    },
+
+    saveGeometry: function () {
+        this._geometryHistory = this._geometryHistory || [];
+        this._geometryHistory.push(L.LatLngUtil.cloneLatLngs(this._poly.getLatLngs()));
+    },
+
+    undo: function () {
+        this._revertChange();
+        this._fireEdit();
     },
 
     _initMarkers: function () {
@@ -205,7 +215,8 @@ L.Edit.Poly = L.Handler.extend({
     },
 
     _revertChange: function () {
-        this._poly._setLatLngs(this._originalLatLngs);
+        if (!this._geometryHistory || !this._geometryHistory.length) { return; }
+        this._poly._setLatLngs(this._geometryHistory.pop());
         this._poly.redraw();
         this.updateMarkers();
     },
@@ -217,7 +228,7 @@ L.Edit.Poly = L.Handler.extend({
     },
 
     _onMarkerDragStart: function () {
-        this._originalLatLngs = L.LatLngUtil.cloneLatLngs(this._poly.getLatLngs());
+        this.saveGeometry();
     },
 
     _onMarkerDrag: function (e) {

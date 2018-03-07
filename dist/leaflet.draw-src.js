@@ -490,17 +490,21 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	},
 
 	_updateGuide: function (newPos) {
-		var markerCount = this._markers.length;
+		try {
+			var markerCount = this._markers.length;
 
-		if (markerCount > 0) {
-			newPos = newPos || this._map.latLngToLayerPoint(this._currentLatLng);
+			if (markerCount > 0) {
+				newPos = newPos || this._map.latLngToLayerPoint(this._currentLatLng);
 
-			// draw the guide line
-			this._clearGuides();
-			this._drawGuide(
-				this._map.latLngToLayerPoint(this._markers[markerCount - 1].getLatLng()),
-				newPos
-			);
+				// draw the guide line
+				this._clearGuides();
+				this._drawGuide(
+					this._map.latLngToLayerPoint(this._markers[markerCount - 1].getLatLng()),
+					newPos
+				);
+			}
+		} catch (e) {
+			console.error(e);
 		}
 	},
 
@@ -582,12 +586,12 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			if (this._markers.length === 1) {
 				labelText = {
 					text: L.drawLocal.draw.handlers.polyline.tooltip.cont,
-					subtext: distanceStr
+					subtext: ''
 				};
 			} else {
 				labelText = {
 					text: L.drawLocal.draw.handlers.polyline.tooltip.end,
-					subtext: distanceStr
+					subtext: ''
 				};
 			}
 		}
@@ -718,7 +722,7 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 	},
 
 	_getTooltipText: function () {
-		var text, subtext;
+		var text;
 
 		if (this._markers.length === 0) {
 			text = L.drawLocal.draw.handlers.polygon.tooltip.start;
@@ -726,12 +730,11 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 			text = L.drawLocal.draw.handlers.polygon.tooltip.cont;
 		} else {
 			text = L.drawLocal.draw.handlers.polygon.tooltip.end;
-			subtext = this._getMeasurementString();
 		}
 
 		return {
 			text: text,
-			subtext: subtext
+			subtext: ''
 		};
 	},
 
@@ -1056,18 +1059,18 @@ L.Draw.Marker = L.Draw.Feature.extend({
 		if (this._map) {
 			if (this._marker) {
 				this._marker.off('click', this._onClick, this);
-				this._map
-					.off('click', this._onClick, this)
-					.off('click', this._onTouch, this)
-					.removeLayer(this._marker);
+				this._map.removeLayer(this._marker);
 				delete this._marker;
 			}
 
-			this._mouseMarker.off('click', this._onClick, this);
 			this._map.removeLayer(this._mouseMarker);
-			delete this._mouseMarker;
+			this._map
+				.off('mousemove', this._onMouseMove, this)
+				.off('click', this._onClick, this)
+				.off('click', this._onTouch, this);
 
-			this._map.off('mousemove', this._onMouseMove, this);
+			this._mouseMarker.off('click', this._onClick, this);
+			delete this._mouseMarker;
 		}
 	},
 
@@ -1224,7 +1227,7 @@ L.Edit.Poly = L.Handler.extend({
     addHooks: function () {
         var poly = this._poly;
 
-        if (!(poly instanceof L.Polygon)) {
+        if (!(poly instanceof L.Polygon) && poly.options.editing) {
             poly.options.editing.fill = false;
         }
 
@@ -1262,6 +1265,16 @@ L.Edit.Poly = L.Handler.extend({
     updateMarkers: function () {
         this._markerGroup.clearLayers();
         this._initMarkers();
+    },
+
+    saveGeometry: function () {
+        this._geometryHistory = this._geometryHistory || [];
+        this._geometryHistory.push(L.LatLngUtil.cloneLatLngs(this._poly.getLatLngs()));
+    },
+
+    undo: function () {
+        this._revertChange();
+        this._fireEdit();
     },
 
     _initMarkers: function () {
@@ -1400,7 +1413,8 @@ L.Edit.Poly = L.Handler.extend({
     },
 
     _revertChange: function () {
-        this._poly._setLatLngs(this._originalLatLngs);
+        if (!this._geometryHistory || !this._geometryHistory.length) { return; }
+        this._poly._setLatLngs(this._geometryHistory.pop());
         this._poly.redraw();
         this.updateMarkers();
     },
@@ -1412,7 +1426,7 @@ L.Edit.Poly = L.Handler.extend({
     },
 
     _onMarkerDragStart: function () {
-        this._originalLatLngs = L.LatLngUtil.cloneLatLngs(this._poly.getLatLngs());
+        this.saveGeometry();
     },
 
     _onMarkerDrag: function (e) {

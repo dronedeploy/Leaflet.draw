@@ -297,17 +297,21 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	},
 
 	_updateGuide: function (newPos) {
-		var markerCount = this._markers.length;
+		try {
+			var markerCount = this._markers.length;
 
-		if (markerCount > 0) {
-			newPos = newPos || this._map.latLngToLayerPoint(this._currentLatLng);
+			if (markerCount > 0) {
+				newPos = newPos || this._map.latLngToLayerPoint(this._currentLatLng);
 
-			// draw the guide line
-			this._clearGuides();
-			this._drawGuide(
-				this._map.latLngToLayerPoint(this._markers[markerCount - 1].getLatLng()),
-				newPos
-			);
+				// draw the guide line
+				this._clearGuides();
+				this._drawGuide(
+					this._map.latLngToLayerPoint(this._markers[markerCount - 1].getLatLng()),
+					newPos
+				);
+			}
+		} catch (e) {
+			console.error(e);
 		}
 	},
 
@@ -389,12 +393,12 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			if (this._markers.length === 1) {
 				labelText = {
 					text: L.drawLocal.draw.handlers.polyline.tooltip.cont,
-					subtext: distanceStr
+					subtext: ''
 				};
 			} else {
 				labelText = {
 					text: L.drawLocal.draw.handlers.polyline.tooltip.end,
-					subtext: distanceStr
+					subtext: ''
 				};
 			}
 		}
