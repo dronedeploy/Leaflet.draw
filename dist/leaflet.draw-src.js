@@ -1299,7 +1299,7 @@ L.Edit.Poly = L.Handler.extend({
             this._markers.push(marker);
         }
 
-        var removeMiddleMarker = maxPoints > 0 && latlngs.length > maxPoints;
+        var removeMiddleMarker = maxPoints > 0 && latlngs.length >= maxPoints;
         if (removeMiddleMarker) {
             return;
         }
