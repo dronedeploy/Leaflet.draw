@@ -14,8 +14,8 @@ L.Edit.MarkerGroup = L.Handler.extend({
 		this.editCircleMarkerOptions = {
 			color: 'white',
 			stroke: true,
-			weight: 1,
-			radius: 6
+			weight: options.weight || 1,
+			radius: options.radius || 6
 		};
 		if (featureGroup.getLayers()[0]) {
 			Object.assign(options, featureGroup.getLayers()[0].options);

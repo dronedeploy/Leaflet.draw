@@ -1,5 +1,5 @@
 /*
- Leaflet.draw 1.0.2+eb963d9, a plugin that adds drawing and editing tools to Leaflet powered maps.
+ Leaflet.draw 1.0.2+700dab5, a plugin that adds drawing and editing tools to Leaflet powered maps.
  (c) 2012-2017, Jacob Toye, Jon West, Smartrak, Leaflet
 
  https://github.com/Leaflet/Leaflet.draw
@@ -8,7 +8,7 @@
 (function (window, document, undefined) {/**
  * Leaflet.draw assumes that you have already included the Leaflet library.
  */
-L.drawVersion = "1.0.2+eb963d9";
+L.drawVersion = "1.0.2+700dab5";
 /**
  * @class L.Draw
  * @aka Draw
@@ -1924,8 +1924,8 @@ L.Edit.MarkerGroup = L.Handler.extend({
 		this.editCircleMarkerOptions = {
 			color: 'white',
 			stroke: true,
-			weight: 1,
-			radius: 6
+			weight: options.weight || 1,
+			radius: options.radius || 6
 		};
 		if (featureGroup.getLayers()[0]) {
 			Object.assign(options, featureGroup.getLayers()[0].options);
