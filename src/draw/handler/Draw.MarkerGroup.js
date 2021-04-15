@@ -33,6 +33,7 @@ L.Draw.MarkerGroup = L.Draw.Feature.extend({
 		L.Draw.Feature.prototype.addHooks.call(this);
 
 		if (this._map) {
+      this._markers = [];
 			this._markerGroup = new L.FeatureGroup([], {pane: 'markerPane'});
 			this._map.addLayer(this._markerGroup);
 
@@ -73,6 +74,7 @@ L.Draw.MarkerGroup = L.Draw.Feature.extend({
 				this._map
 					.removeLayer(this._markerGroup);
 				delete this._markerGroup;
+        delete this._markers;
 			}
 
 			this._map.removeLayer(this._mouseMarker);
@@ -84,6 +86,14 @@ L.Draw.MarkerGroup = L.Draw.Feature.extend({
 			delete this._mouseMarker;
 		}
 	},
+
+  deleteLastVertex: function() {
+    if (this._markers.length <= 1) {
+			return;
+		}
+    var lastMarker = this._markers.pop();
+    this._markerGroup.removeLayer(lastMarker);
+  },
 
 	completeShape: function() {
 		if (this._markerGroup.getLayers().length < 1) {
@@ -106,8 +116,8 @@ L.Draw.MarkerGroup = L.Draw.Feature.extend({
 
 	_onClick: function () {
 		var createdMarker = this._createMarker(this._mouseMarker.getLatLng());
+    this._markers.push(createdMarker);
 		this._markerGroup.addLayer(createdMarker);
-		this.completeShape();
 	},
 
 	_fireCreatedEvent: function () {
